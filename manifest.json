@@ -1,0 +1,16 @@
+{
+  "short_name": "Bloom",
+  "name": "Bloom Wellness Organizer",
+  "icons": [
+    {
+      "src": "./bloom_icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0f1715",
+  "theme_color": "#7ab893",
+  "display": "standalone",
+  "orientation": "portrait"
+}

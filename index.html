@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bloom Wellness Organizer</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Bloom Wellness - An interactive personal wellness organizer and passive income model template. Track mood, energy, habits, journaling and monitor ad-based earnings.">
+  <meta name="keywords" content="wellness planner, mood tracker, habit builder, journaling, creator economy, passive income tracker">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#7ab893">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="bloom_icon.png">
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-sage font-inter">
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar-panel">
+      <div class="sidebar-header">
+        <div class="logo-area">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/>
+            <path d="M12 22V12"/>
+            <path d="M12 12c2.5-3 5.5-3.5 7.5-1.5s1 5-1.5 7.5c-2.5 2.5-5.5.5-6-6z"/>
+            <path d="M12 12c-2.5-3-5.5-3.5-7.5-1.5s-1 5 1.5 7.5c2.5 2.5 5.5.5 6-6z"/>
+          </svg>
+          <span class="logo-text font-outfit">Bloom</span>
+        </div>
+        <button id="mobile-menu-close" class="btn-icon mobile-only">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-item" data-tab="calendar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Calendar & Log
+        </button>
+        <button class="nav-item" data-tab="habits">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Habit Tracker
+        </button>
+        <button class="nav-item" data-tab="journal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Journal Space
+        </button>
+        <button class="nav-item" data-tab="store">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          Store & Affiliates
+        </button>
+        <button class="nav-item" data-tab="analytics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Creator Dashboard
+        </button>
+      </nav>
+
+      <!-- Creator Sidebar Integration -->
+      <div class="sidebar-footer-card">
+        <div class="creator-preview">
+          <div class="creator-label">ESTIMATED EARNINGS</div>
+          <div class="earnings-value font-outfit" id="sidebar-earnings">$0.00</div>
+          <div class="traffic-light">
+            <span class="pulse-dot"></span>
+            <span id="sidebar-traffic-status">Traffic: Active</span>
+          </div>
+        </div>
+        <button id="open-tipjar-btn" class="btn btn-secondary btn-sm btn-block">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-inline"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Show Tip Jar
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Container -->
+    <main class="main-panel">
+      
+      <!-- Top Bar -->
+      <header class="app-header">
+        <div class="header-left">
+          <button id="mobile-menu-open" class="btn-icon mobile-only">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="header-titles">
+            <h1 id="page-title" class="font-outfit text-2xl font-bold">Dashboard</h1>
+            <p id="page-subtitle" class="text-sm opacity-75">Welcome back to your mindfulness center.</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <!-- Theme Picker -->
+          <div class="theme-dropdown-container">
+            <label for="theme-select" class="sr-only">Choose Accent</label>
+            <select id="theme-select" class="select-clean">
+              <option value="theme-sage">🌿 Sage Green</option>
+              <option value="theme-rose">🌸 Rose Quartz</option>
+              <option value="theme-lavender">🔮 Lavender Mist</option>
+              <option value="theme-ocean">🌊 Ocean Breeze</option>
+            </select>
+          </div>
+          <!-- Go Premium Simulated Switch -->
+          <button id="premium-toggle" class="btn btn-glow font-outfit">
+            <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>Simulate Premium</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div class="content-viewport">
+
+        <!-- VIEW 1: DASHBOARD -->
+        <section id="view-dashboard" class="tab-view active">
+          <div class="dashboard-grid">
+            
+            <!-- Quick Daily Checkin Card -->
+            <div class="glass-card col-span-2 relative-header-card">
+              <div class="card-bg-gradient"></div>
+              <div class="card-header-actions">
+                <h2 class="font-outfit text-xl font-bold text-white">Daily Wellness Check-In</h2>
+                <span class="card-badge">Daily Prompt</span>
+              </div>
+              <p class="text-white opacity-85 mb-4 max-w-lg">Log your mood, physical energy, and journal reflections to maintain your annual wellness streaks and trends.</p>
+              <button id="dash-checkin-btn" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-inline"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Complete Daily Log
+              </button>
+            </div>
+
+            <!-- Focus Pomodoro Widget -->
+            <div class="glass-card flex-col-center">
+              <h3 class="font-outfit text-lg font-bold mb-3">Focus Timer</h3>
+              <div class="timer-svg-container">
+                <svg class="progress-ring" width="160" height="160">
+                  <circle class="progress-ring__circle-bg" stroke="rgba(255,255,255,0.06)" stroke-width="8" fill="transparent" r="70" cx="80" cy="80" />
+                  <circle id="timer-progress" class="progress-ring__circle" stroke="var(--accent-color)" stroke-width="8" stroke-dasharray="439.8" stroke-dashoffset="0" stroke-linecap="round" fill="transparent" r="70" cx="80" cy="80" />
+                </svg>
+                <div id="timer-display" class="timer-text font-outfit">25:00</div>
+              </div>
+              <div class="timer-type-selector mt-4">
+                <button class="timer-type-btn active" data-type="focus">Focus</button>
+                <button class="timer-type-btn" data-type="short">Short Break</button>
+                <button class="timer-type-btn" data-type="long">Long Break</button>
+              </div>
+              <div class="timer-controls mt-4">
+                <button id="timer-play-btn" class="btn btn-icon btn-primary">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="timer-play-icon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </button>
+                <button id="timer-reset-btn" class="btn btn-icon btn-secondary">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Habits Overview Card -->
+            <div class="glass-card">
+              <div class="flex-between mb-4">
+                <h3 class="font-outfit text-lg font-bold">Today's Habits</h3>
+                <button class="link-btn" data-go-tab="habits">View All</button>
+              </div>
+              <div id="dash-habits-list" class="habit-list-compact">
+                <!-- Injected by JS -->
+                <p class="text-sm opacity-60">No habits defined yet.</p>
+              </div>
+            </div>
+
+            <!-- Mood Track Summary -->
+            <div class="glass-card">
+              <h3 class="font-outfit text-lg font-bold mb-3">Energy & Mood Today</h3>
+              <div id="dash-mood-summary" class="mood-summary-container">
+                <!-- Injected by JS -->
+                <div class="empty-state-checkin">
+                  <p class="text-sm opacity-60 mb-2">No data logged for today yet.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Passive Income Education Banner -->
+            <div class="glass-card col-span-2 highlight-income-card">
+              <div class="flex-between">
+                <div>
+                  <h3 class="font-outfit text-md font-bold text-accent">Creator Strategy Insight</h3>
+                  <p class="text-xs opacity-80 mt-1 max-w-xl">This app demonstrates how to monetize a free wellness app. Below is a simulated AdMob banner. In our <strong>Store & Affiliates</strong> page, users find affiliate products and custom printables. Visit the <strong>Creator Dashboard</strong> to see simulated revenue stats!</p>
+                </div>
+                <button class="btn btn-xs btn-outline" data-go-tab="analytics">View Creator Dashboard</button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- VIEW 2: CALENDAR -->
+        <section id="view-calendar" class="tab-view">
+          <div class="calendar-layout">
+            <div class="glass-card">
+              <div class="calendar-header flex-between mb-4">
+                <h2 id="calendar-month-year" class="font-outfit text-lg font-bold">June 2026</h2>
+                <div class="calendar-nav-buttons">
+                  <button id="prev-month-btn" class="btn btn-icon btn-sm">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                  </button>
+                  <button id="next-month-btn" class="btn btn-icon btn-sm">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Weekday Header -->
+              <div class="calendar-weekdays font-outfit text-xs font-bold opacity-60">
+                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+              </div>
+              
+              <!-- Calendar Grid -->
+              <div id="calendar-grid" class="calendar-days-grid">
+                <!-- Days injected by JS -->
+              </div>
+            </div>
+
+            <div class="glass-card">
+              <h3 class="font-outfit text-md font-bold mb-3">Day Log Details</h3>
+              <div id="calendar-day-details" class="day-details-panel">
+                <p class="opacity-60 text-sm">Select a day in the calendar to view logged mood, energy, goals, and journal reflections.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 3: HABITS -->
+        <section id="view-habits" class="tab-view">
+          <div class="habits-layout">
+            <!-- Left Column: Creator & Reminders -->
+            <div class="space-y-4">
+              <!-- Habit Creator Card -->
+              <div class="glass-card">
+                <h3 class="font-outfit text-lg font-bold mb-3">Add Custom Habit</h3>
+                <form id="habit-form" class="space-y-4">
+                  <div>
+                    <label class="form-label" for="habit-name">Habit Name</label>
+                    <input type="text" id="habit-name" class="input-field" placeholder="e.g., Drink 8 cups of water" required>
+                  </div>
+                  <div>
+                    <label class="form-label" for="habit-category">Category</label>
+                    <select id="habit-category" class="input-field">
+                      <option value="physical">💪 Physical Wellness</option>
+                      <option value="mental">🧘 Mental Well-being</option>
+                      <option value="diet">🍎 Nutrition & Diet</option>
+                      <option value="spirit">✨ Self Care / Soul</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-block">Add Habit</button>
+                </form>
+              </div>
+
+              <!-- Self-Care Reminders Card -->
+              <div class="glass-card">
+                <h3 class="font-outfit text-md font-bold mb-2">Self-Care Routines</h3>
+                <p class="text-xs opacity-75 mb-4">Toggle background browser reminders for interval-based wellness breaks.</p>
+                <div class="space-y-3">
+                  <div class="flex-between">
+                    <div>
+                      <span class="text-sm font-semibold">Hydration Break</span>
+                      <span class="text-xs opacity-60 block">Drink water (every 2 hrs)</span>
+                    </div>
+                    <button class="btn btn-xs btn-outline routine-toggle" data-routine="water">Enable</button>
+                  </div>
+                  <div class="flex-between">
+                    <div>
+                      <span class="text-sm font-semibold">Postural Stretching</span>
+                      <span class="text-xs opacity-60 block">Move & stretch (every 3 hrs)</span>
+                    </div>
+                    <button class="btn btn-xs btn-outline routine-toggle" data-routine="stretch">Enable</button>
+                  </div>
+                  <div class="flex-between">
+                    <div>
+                      <span class="text-sm font-semibold">Screen Eye Break</span>
+                      <span class="text-xs opacity-60 block">20-20-20 rule (every 45 mins)</span>
+                    </div>
+                    <button class="btn btn-xs btn-outline routine-toggle" data-routine="eyes">Enable</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Habit Checklist Grid -->
+            <div class="glass-card">
+              <h3 class="font-outfit text-lg font-bold mb-4">Habit Tracker</h3>
+              <div id="habits-list-container" class="space-y-3">
+                <!-- Habits injected by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 4: JOURNAL -->
+        <section id="view-journal" class="tab-view">
+          <div class="journal-layout">
+            <!-- Prompt Selector & Writing Area -->
+            <div class="glass-card col-span-2 flex-col">
+              <div class="flex-between mb-3">
+                <h3 class="font-outfit text-lg font-bold">Write in Journal</h3>
+                <button id="new-prompt-btn" class="btn btn-xs btn-outline">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-inline"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  New Prompt
+                </button>
+              </div>
+              <div class="prompt-box mb-4">
+                <span class="prompt-label font-outfit text-xs">DAILY REFLECTION PROMPT</span>
+                <p id="journal-prompt-text" class="text-sm font-semibold mt-1">What is one thing you can let go of today to reduce your stress?</p>
+              </div>
+              <form id="journal-form" class="flex-1 flex-col space-y-4">
+                <div class="flex-1">
+                  <label class="sr-only" for="journal-entry">Journal Entry</label>
+                  <textarea id="journal-entry" class="textarea-field flex-1" placeholder="Type your thoughts here..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary align-self-end">Save Entry</button>
+              </form>
+            </div>
+
+            <!-- Saved Entries History -->
+            <div class="glass-card">
+              <h3 class="font-outfit text-lg font-bold mb-3">Journal Logs</h3>
+              <div id="journal-logs-container" class="space-y-3 journal-logs-scroll">
+                <!-- Log items injected by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 5: STORE & AFFILIATES -->
+        <section id="view-store" class="tab-view">
+          <!-- Monetization Explainer -->
+          <div class="monetization-intro glass-card mb-6">
+            <h2 class="font-outfit text-lg font-bold text-accent">Integrated Passive Income Channels</h2>
+            <p class="text-sm opacity-90 mt-1">As a developer, you don't need to charge for downloads. This screen displays a <strong>Digital Storefront</strong> (e.g., linked to Gumroad/Etsy) and an <strong>Affiliate Store</strong> (e.g., Amazon/ShareASale). Clicking items simulates real-world interactions and commissions, feeding directly into your Creator Dashboard.</p>
+          </div>
+
+          <div class="store-grid">
+            <!-- Affiliate Recommendations Section -->
+            <div class="glass-card">
+              <div class="flex-between mb-4 border-b-glass pb-2">
+                <h3 class="font-outfit text-md font-bold">Top 5 Self-Care Tools (Affiliate Products)</h3>
+                <span class="badge badge-accent">8-12% Commission</span>
+              </div>
+              <p class="text-xs opacity-75 mb-4">Curated products embedded directly into the daily flow of the app. Clicking 'Buy on Amazon' simulates an affiliate sale conversion.</p>
+              <div id="affiliate-list" class="space-y-4">
+                <!-- Injected by JS -->
+              </div>
+            </div>
+
+            <!-- Digital Downloads Section -->
+            <div class="glass-card">
+              <div class="flex-between mb-4 border-b-glass pb-2">
+                <h3 class="font-outfit text-md font-bold">Digital Store (Printables & Guides)</h3>
+                <span class="badge badge-premium">95% Margin</span>
+              </div>
+              <p class="text-xs opacity-75 mb-4">Downloadable planners, templates, or courses sold directly to users via external Gumroad/Etsy embeds.</p>
+              <div id="digital-list" class="space-y-4">
+                <!-- Injected by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 6: CREATOR DASHBOARD -->
+        <section id="view-analytics" class="tab-view">
+          
+          <!-- Key Earnings Metrics Grid -->
+          <div class="metrics-grid mb-6">
+            <div class="metric-card glass-card">
+              <div class="metric-info">
+                <span class="metric-label">Simulated Downloads</span>
+                <span class="metric-value font-outfit" id="stats-downloads">12,450</span>
+              </div>
+              <div class="metric-icon bg-teal-soft">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              </div>
+            </div>
+            
+            <div class="metric-card glass-card">
+              <div class="metric-info">
+                <span class="metric-label">Daily Active Users (DAU)</span>
+                <span class="metric-value font-outfit" id="stats-dau">2,180</span>
+              </div>
+              <div class="metric-icon bg-blue-soft">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+            
+            <div class="metric-card glass-card">
+              <div class="metric-info">
+                <span class="metric-label">Simulated Impressions (Ads)</span>
+                <span class="metric-value font-outfit" id="stats-impressions">0</span>
+              </div>
+              <div class="metric-icon bg-purple-soft">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+              </div>
+            </div>
+
+            <div class="metric-card glass-card highlighting-earnings">
+              <div class="metric-info">
+                <span class="metric-label text-accent font-bold">TOTAL SIMULATED REVENUE</span>
+                <span class="metric-value font-outfit" id="stats-earnings">$0.00</span>
+              </div>
+              <div class="metric-icon bg-gold-soft">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulation Controllers -->
+          <div class="dashboard-grid mb-6">
+            <div class="glass-card">
+              <h3 class="font-outfit text-md font-bold mb-2">Simulate App Traffic</h3>
+              <p class="text-xs opacity-75 mb-4">Turn on traffic simulation to watch app downloads, ad impressions, and passive earnings tick up in real time.</p>
+              <div class="flex-between">
+                <span class="toggle-text text-sm">Automated Traffic Engine</span>
+                <button id="traffic-engine-toggle" class="btn btn-outline btn-sm">Start Simulation</button>
+              </div>
+            </div>
+            
+            <div class="glass-card">
+              <h3 class="font-outfit text-md font-bold mb-2">Breakdown of Passive Income</h3>
+              <div class="earnings-breakdown-details text-sm space-y-2 mt-2">
+                <div class="flex-between"><span>AdMob (Banner & Interstitials):</span><strong id="breakdown-ads">$0.00</strong></div>
+                <div class="flex-between"><span>Affiliate Commissions:</span><strong id="breakdown-affiliates">$0.00</strong></div>
+                <div class="flex-between"><span>Digital Store Sales:</span><strong id="breakdown-digital">$0.00</strong></div>
+                <div class="flex-between"><span>Support Tip Jar:</span><strong id="breakdown-tips">$0.00</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="dashboard-grid">
+            <div class="glass-card col-span-2">
+              <h3 class="font-outfit text-lg font-bold mb-3">Simulated Monthly Earnings Growth</h3>
+              <p class="text-xs opacity-70 mb-4">A visual rendering of your app's monthly passive income trajectory, assuming typical CPM, affiliate commission, and download growth values.</p>
+              <canvas id="earnings-chart" height="150" class="canvas-chart-holder"></canvas>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+
+      <!-- Persistent AdMob Placeholder Banner -->
+      <div class="admob-sim-banner">
+        <div class="ad-top-bar">
+          <span class="ad-tag">SPONSORED AD</span>
+          <span class="admob-badge">Ads by Google AdMob</span>
+        </div>
+        <div class="ad-content-box">
+          <div class="ad-details">
+            <h4 id="simulated-ad-title" class="font-outfit">Soothe Mindfulness App</h4>
+            <p id="simulated-ad-text" class="text-xs opacity-75">10-day audio meditations to reduce anxiety. Download today!</p>
+          </div>
+          <button id="simulated-ad-action-btn" class="btn btn-primary btn-xs">Install Now</button>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- MODAL: DAILY CHECK-IN -->
+  <div id="checkin-modal" class="modal-overlay">
+    <div class="modal-container glass-card">
+      <div class="modal-header">
+        <h2 class="font-outfit text-xl font-bold">Daily Wellness Log</h2>
+        <button id="checkin-modal-close" class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="checkin-form" class="space-y-4 mt-4">
+        <!-- Mood Slider -->
+        <div>
+          <div class="flex-between">
+            <label class="form-label" for="checkin-mood">Current Mood (1 - 10)</label>
+            <span id="mood-val" class="slider-value font-outfit">7</span>
+          </div>
+          <input type="range" id="checkin-mood" min="1" max="10" value="7" class="slider-field">
+          <div class="flex-between text-xs opacity-50 mt-1"><span>Tired / Sad</span><span>Energetic / Happy</span></div>
+        </div>
+
+        <!-- Energy Slider -->
+        <div>
+          <div class="flex-between">
+            <label class="form-label" for="checkin-energy">Physical Energy (1 - 10)</label>
+            <span id="energy-val" class="slider-value font-outfit">6</span>
+          </div>
+          <input type="range" id="checkin-energy" min="1" max="10" value="6" class="slider-field">
+          <div class="flex-between text-xs opacity-50 mt-1"><span>Low Energy</span><span>Peak Vitality</span></div>
+        </div>
+
+        <!-- Gratitude Entry -->
+        <div>
+          <label class="form-label" for="checkin-gratitude">One thing you are grateful for today</label>
+          <input type="text" id="checkin-gratitude" class="input-field" placeholder="e.g. A hot cup of coffee" required>
+        </div>
+
+        <!-- Primary Focus -->
+        <div>
+          <label class="form-label" for="checkin-focus">Today's main wellness goal</label>
+          <input type="text" id="checkin-focus" class="input-field" placeholder="e.g. 20 minute walk in nature" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-4">Submit Daily Log</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TIP JAR -->
+  <div id="tipjar-modal" class="modal-overlay">
+    <div class="modal-container glass-card max-w-sm">
+      <div class="modal-header">
+        <h2 class="font-outfit text-lg font-bold">Support the Creator</h2>
+        <button id="tipjar-modal-close" class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="text-center p-4">
+        <div class="coffee-cup-icon mb-4">
+          ☕
+        </div>
+        <p class="text-sm opacity-90 mb-4">Adding a "Tip Jar" (like Buy Me a Coffee or Ko-fi) is a great way to let users support free apps directly. Select a simulated tip below to support!</p>
+        
+        <div class="tip-options-row">
+          <button class="btn btn-sm btn-outline tip-option" data-tip="1.00">$1.00</button>
+          <button class="btn btn-sm btn-outline tip-option" data-tip="3.00">$3.00</button>
+          <button class="btn btn-sm btn-outline tip-option" data-tip="5.00">$5.00</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Modules -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>

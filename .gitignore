@@ -1,0 +1,22 @@
+# Dependency directories
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build outputs
+client/dist/
+client/out/
+
+# Database files
+server/data/db.json
+
+# Configuration secrets
+.env
+client/.env
+server/.env
+server/data/*.json
+
+# Operating System files
+.DS_Store
+Thumbs.db
+*.log
