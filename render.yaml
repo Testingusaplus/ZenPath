@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: zenpath-wellness
+    env: node
+    plan: free
+    buildCommand: npm install && cd client && npm install --legacy-peer-deps && npm run build && cd ../server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NPM_USE_ACTIVE_VERSION
+        value: "true"
