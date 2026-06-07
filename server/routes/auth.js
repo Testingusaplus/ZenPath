@@ -133,7 +133,7 @@ router.post('/admin/login', (req, res) => {
 
   // Generate a mock 6-digit OTP
   const otp = '884299'; // Secure fixed code for easy testing / demo
-  activeOtps.set(user.email, {
+  activeOtps.set(user.email.toLowerCase(), {
     otp,
     expires: Date.now() + 5 * 60 * 1000 // 5 minutes
   });
@@ -155,13 +155,14 @@ router.post('/admin/verify-2fa', (req, res) => {
     return res.status(400).json({ message: 'Email and OTP are required' });
   }
 
-  const otpData = activeOtps.get(email);
+  const normalizedEmail = email.toLowerCase();
+  const otpData = activeOtps.get(normalizedEmail);
   if (!otpData) {
     return res.status(400).json({ message: 'No active login session found' });
   }
 
   if (Date.now() > otpData.expires) {
-    activeOtps.delete(email);
+    activeOtps.delete(normalizedEmail);
     return res.status(400).json({ message: 'OTP has expired' });
   }
 
@@ -170,8 +171,8 @@ router.post('/admin/verify-2fa', (req, res) => {
   }
 
   // Successful 2FA verification
-  activeOtps.delete(email);
-  const user = db.find('users', u => u.email === email);
+  activeOtps.delete(normalizedEmail);
+  const user = db.find('users', u => u.email.toLowerCase() === normalizedEmail);
 
   // Update last login
   db.update('users', user.id, { lastLogin: new Date().toISOString() });

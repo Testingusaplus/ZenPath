@@ -3,7 +3,7 @@ services:
     name: zenpath-wellness
     env: node
     plan: free
-    buildCommand: npm install && cd client && npm install --legacy-peer-deps && npm run build && cd ../server && npm install
+    buildCommand: cd client && npm install --legacy-peer-deps && npm run build && cd ../server && npm install
     startCommand: cd server && npm start
     envVars:
       - key: NODE_ENV
