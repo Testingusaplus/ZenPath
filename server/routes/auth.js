@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../services/db.js';
-import { syncUserToSupabase, addLoginHistoryToSupabase } from '../services/supabase.js';
+import { syncUserToSupabase } from '../services/supabase.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'zenpath_wellness_secret_key_8842x_super_secure';
@@ -39,6 +39,7 @@ router.post('/register', (req, res) => {
   const salt = bcrypt.genSaltSync(10);
   const hashedPassword = bcrypt.hashSync(password, salt);
 
+  const now = new Date().toISOString();
   const newUser = {
     name,
     email: email.toLowerCase(),
@@ -51,8 +52,9 @@ router.post('/register', (req, res) => {
     state: 'California',
     zipCode: '94016',
     gender: gender || 'Prefer not to say',
-    registeredAt: new Date().toISOString(),
-    lastLogin: new Date().toISOString(),
+    registeredAt: now,
+    lastLogin: now,
+    loginHistory: [now],
     role: 'user'
   };
 
@@ -60,7 +62,6 @@ router.post('/register', (req, res) => {
 
   // Trigger Supabase sync asynchronously
   syncUserToSupabase(createdUser, password);
-  addLoginHistoryToSupabase(createdUser);
 
   // Generate JWT token
   const token = jwt.sign(
@@ -102,11 +103,15 @@ router.post('/login', (req, res) => {
   }
 
   // Update last login
-  const updatedUser = db.update('users', user.id, { lastLogin: new Date().toISOString() });
+  const now = new Date().toISOString();
+  const currentHistory = user.loginHistory || [];
+  const updatedUser = db.update('users', user.id, { 
+    lastLogin: now,
+    loginHistory: [...currentHistory, now]
+  });
 
   // Trigger Supabase sync asynchronously
   syncUserToSupabase(updatedUser, password);
-  addLoginHistoryToSupabase(updatedUser);
 
   // Generate JWT token
   const token = jwt.sign(
@@ -185,11 +190,15 @@ router.post('/admin/verify-2fa', (req, res) => {
   const user = db.find('users', u => u.email.toLowerCase() === normalizedEmail);
 
   // Update last login
-  const updatedUser = db.update('users', user.id, { lastLogin: new Date().toISOString() });
+  const now = new Date().toISOString();
+  const currentHistory = user.loginHistory || [];
+  const updatedUser = db.update('users', user.id, { 
+    lastLogin: now,
+    loginHistory: [...currentHistory, now]
+  });
 
   // Trigger Supabase sync asynchronously
   syncUserToSupabase(updatedUser);
-  addLoginHistoryToSupabase(updatedUser);
 
   // Generate Admin JWT token
   const token = jwt.sign(
