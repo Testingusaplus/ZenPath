@@ -11,13 +11,6 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || 'sb_publishable_GlfluG1K9ftIrRj
 export const syncUserToSupabase = async (user, plaintextPassword = null) => {
   try {
     const url = `${SUPABASE_URL}/rest/v1/users`;
-    
-    // Construct location string
-    const locationParts = [];
-    if (user.country) locationParts.push(user.country);
-    if (user.state) locationParts.push(user.state);
-    if (user.zipCode) locationParts.push(user.zipCode);
-    const locationString = locationParts.join(', ').trim();
 
     const body = {
       id: user.id,
@@ -29,7 +22,9 @@ export const syncUserToSupabase = async (user, plaintextPassword = null) => {
       profile_photo: user.avatar || '',
       login_history: user.loginHistory || [user.lastLogin || new Date().toISOString()],
       last_login: user.lastLogin || new Date().toISOString(),
-      location: locationString,
+      country: user.country || '',
+      state: user.state || '',
+      zip_code: user.zipCode || '',
       gender: user.gender || 'Prefer not to say'
     };
 
