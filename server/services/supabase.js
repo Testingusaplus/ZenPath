@@ -54,3 +54,35 @@ export const syncUserToSupabase = async (user, plaintextPassword = null) => {
     return false;
   }
 };
+
+/**
+ * Fetches a user record from the Supabase backend by email.
+ * 
+ * @param {string} email - The email to search for.
+ * @returns {Promise<object|null>} - The user object or null if not found.
+ */
+export const getUserByEmail = async (email) => {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(email.toLowerCase())}&select=*`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    if (Array.isArray(data) && data.length > 0) {
+      return data[0];
+    }
+    return null;
+  } catch (error) {
+    console.error(`[Supabase Get User Error] Exception:`, error);
+    return null;
+  }
+};

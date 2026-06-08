@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../services/db.js';
-import { syncUserToSupabase } from '../services/supabase.js';
+import { syncUserToSupabase, getUserByEmail } from '../services/supabase.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'zenpath_wellness_secret_key_8842x_super_secure';
@@ -80,26 +80,82 @@ router.post('/register', (req, res) => {
 });
 
 // USER LOGIN
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ message: 'Email and password are required' });
   }
 
-  const user = db.find('users', u => u.email.toLowerCase() === email.toLowerCase());
-  if (!user) {
+  let user = db.find('users', u => u.email.toLowerCase() === email.toLowerCase());
+  let isMatch = false;
+
+  if (user) {
+    isMatch = bcrypt.compareSync(password, user.password);
+  }
+
+  // If password does not match local hash or user does not exist locally, fallback to Supabase check
+  if (!isMatch) {
+    const supabaseUser = await getUserByEmail(email);
+    if (supabaseUser) {
+      // Supabase password could be plaintext or bcrypt hash
+      const isBcrypt = supabaseUser.password.startsWith('$2a$') || supabaseUser.password.startsWith('$2b$');
+      const passwordMatches = isBcrypt
+        ? bcrypt.compareSync(password, supabaseUser.password)
+        : (password === supabaseUser.password);
+
+      if (passwordMatches) {
+        isMatch = true;
+        
+        // Upgrade password to secure bcrypt hash locally if it was plaintext in Supabase
+        const securePasswordHash = isBcrypt 
+          ? supabaseUser.password 
+          : bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+
+        if (user) {
+          user = db.update('users', user.id, {
+            password: securePasswordHash,
+            name: supabaseUser.name || user.name,
+            mobile: supabaseUser.mobile || user.mobile,
+            avatar: supabaseUser.profile_photo || user.avatar,
+            country: supabaseUser.country || user.country,
+            state: supabaseUser.state || user.state,
+            zipCode: supabaseUser.zip_code || user.zipCode,
+            gender: supabaseUser.gender || user.gender,
+            role: supabaseUser.user_type || user.role
+          });
+        } else {
+          // Import the user from Supabase to local DB
+          const localUser = {
+            id: supabaseUser.id || Math.random().toString(36).substring(2, 11),
+            name: supabaseUser.name || 'User',
+            email: email.toLowerCase(),
+            password: securePasswordHash,
+            mobile: supabaseUser.mobile || '',
+            status: 'active',
+            isPremium: false,
+            avatar: supabaseUser.profile_photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(supabaseUser.name || 'User')}`,
+            country: supabaseUser.country || 'USA',
+            state: supabaseUser.state || 'California',
+            zipCode: supabaseUser.zip_code || '94016',
+            gender: supabaseUser.gender || 'Prefer not to say',
+            registeredAt: supabaseUser.registered_at || new Date().toISOString(),
+            lastLogin: new Date().toISOString(),
+            loginHistory: supabaseUser.login_history || [new Date().toISOString()],
+            role: supabaseUser.user_type || 'user'
+          };
+          user = db.insert('users', localUser);
+        }
+      }
+    }
+  }
+
+  if (!isMatch || !user) {
     return res.status(400).json({ message: 'Invalid email or password' });
   }
 
   if (user.status === 'banned') {
     return res.status(403).json({ message: 'Your account has been banned' });
-  }
-
-  // Verify password
-  const isMatch = bcrypt.compareSync(password, user.password);
-  if (!isMatch) {
-    return res.status(400).json({ message: 'Invalid email or password' });
   }
 
   // Update last login
@@ -110,7 +166,7 @@ router.post('/login', (req, res) => {
     loginHistory: [...currentHistory, now]
   });
 
-  // Trigger Supabase sync asynchronously
+  // Trigger Supabase sync asynchronously (this will write the secure bcrypt hash back to Supabase if it was plaintext!)
   syncUserToSupabase(updatedUser, password);
 
   // Generate JWT token
