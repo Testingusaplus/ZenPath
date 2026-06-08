@@ -13,6 +13,7 @@ const LoginPage: React.FC<Props> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
+  const [gender, setGender] = useState('Prefer not to say');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +24,7 @@ const LoginPage: React.FC<Props> = ({ onLogin }) => {
 
     try {
       if (isRegister) {
-        const data = await api.auth.register({ name, email, password, mobile });
+        const data = await api.auth.register({ name, email, password, mobile, gender });
         localStorage.setItem('zp_token', data.token);
         onLogin(data.user);
       } else {
@@ -115,6 +116,23 @@ const LoginPage: React.FC<Props> = ({ onLogin }) => {
                   placeholder="+1 (555) 000-0000"
                 />
               </div>
+            </div>
+          )}
+
+          {isRegister && (
+            <div>
+              <label className="block text-xs font-semibold text-gray-400 dark:text-gray-500 mb-1">Gender</label>
+              <select 
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="w-full bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 focus:border-teal-500 rounded-2xl px-4 py-3 outline-none text-sm transition-colors text-gray-800 dark:text-white cursor-pointer"
+              >
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Non-binary">Non-binary</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
             </div>
           )}
 

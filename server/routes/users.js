@@ -1,6 +1,7 @@
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { db } from '../services/db.js';
+import { syncUserToSupabase } from '../services/supabase.js';
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.get('/profile', requireAuth, (req, res) => {
 
 // UPDATE PROFILE
 router.put('/profile', requireAuth, (req, res) => {
-  const { name, mobile, avatar, country, state, zipCode } = req.body;
+  const { name, mobile, avatar, country, state, zipCode, gender } = req.body;
 
   const updates = {};
   if (name !== undefined) updates.name = name;
@@ -20,6 +21,7 @@ router.put('/profile', requireAuth, (req, res) => {
   if (avatar !== undefined) updates.avatar = avatar; // base64 representation
   if (country !== undefined) updates.country = country;
   if (state !== undefined) updates.state = state;
+  if (gender !== undefined) updates.gender = gender;
   
   // Custom Validation rules for postal code based on selected country
   if (zipCode !== undefined) {
@@ -44,6 +46,10 @@ router.put('/profile', requireAuth, (req, res) => {
   }
 
   const updatedUser = db.update('users', req.user.userId, updates);
+
+  // Trigger Supabase sync asynchronously
+  syncUserToSupabase(updatedUser);
+
   const { password: _, ...userWithoutPassword } = updatedUser;
   res.json(userWithoutPassword);
 });

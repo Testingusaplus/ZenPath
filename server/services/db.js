@@ -28,6 +28,7 @@ const initialData = {
       country: "USA",
       state: "California",
       zipCode: "94016",
+      gender: "Prefer not to say",
       registeredAt: new Date().toISOString(),
       lastLogin: new Date().toISOString(),
       role: "admin"

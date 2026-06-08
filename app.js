@@ -702,6 +702,10 @@ const HabitModule = {
   },
 
   toggleRoutine(routine, btn) {
+    if (!BloomState.premium) {
+      showPremiumPrompt("Unlock background self-care reminders (hydration breaks, stretching intervals, screen eye breaks)!");
+      return;
+    }
     if (this.activeRoutines[routine]) {
       // Disable
       clearInterval(this.activeRoutines[routine]);
@@ -1315,6 +1319,43 @@ const AnalyticsModule = {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, width, height);
 
+    if (!BloomState.premium) {
+      // Draw a blurred locked placeholder graph
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw grid lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 1;
+      for (let i = 1; i <= 3; i++) {
+        const y = (height / 4) * i;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+      }
+
+      // Draw blur curve
+      ctx.strokeStyle = 'rgba(122, 184, 147, 0.12)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(40, 160);
+      ctx.bezierCurveTo(width / 3, 150, width / 2, 70, width - 40, 50);
+      ctx.stroke();
+
+      // Lock Screen Text
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.font = 'bold 13px Outfit, Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText("🔒 Monthly Earnings Projection Locked", width / 2, height / 2 - 10);
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.fillText("Upgrade to Bloom Premium to unlock advanced creator analytics forecasting.", width / 2, height / 2 + 10);
+
+      ctx.fillStyle = 'var(--accent-color)';
+      ctx.font = 'bold 10px Inter, sans-serif';
+      ctx.fillText("Click 'Simulate Premium' in header or toggle PWA features to unlock", width / 2, height / 2 + 30);
+      return;
+    }
+
     // Dynamic data: Month-over-month simulated earnings trajectory
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun (Proj)'];
     
@@ -1672,6 +1713,13 @@ function initGeneralApp() {
     select.addEventListener('change', (e) => {
       const activeTheme = e.target.value;
       
+      if (!BloomState.premium && activeTheme !== 'theme-sage') {
+        // Reset to default
+        select.value = 'theme-sage';
+        showPremiumPrompt("Unlock custom premium wellness themes like Rose Quartz, Lavender Mist, and Ocean Breeze!");
+        return;
+      }
+      
       // Update body classes
       document.body.className = `font-inter ${activeTheme}`;
       
@@ -1713,6 +1761,83 @@ function initGeneralApp() {
       }
 
       BloomState.save();
+      
+      // Update UI elements instantly across tabs
+      DashboardModule.render();
+      CalendarModule.renderCalendar();
+      HabitModule.render();
+      if (document.getElementById('view-analytics').classList.contains('active')) {
+        AnalyticsModule.render();
+      }
+    });
+  }
+}
+
+// Premium Checkout Dialog Simulator
+function showPremiumPrompt(message) {
+  const existing = document.querySelector('.premium-lock-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay active premium-lock-modal';
+  
+  modal.innerHTML = `
+    <div class="modal-container glass-card" style="max-width: 400px; border-color: #d4af37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.25)">
+      <div class="modal-header">
+        <h2 class="font-outfit text-md font-bold" style="color: #f3e5ab">👑 Unlock Bloom Premium</h2>
+        <button class="btn-icon close-premium-modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="text-center p-4">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🔓</div>
+        <p class="text-sm opacity-90 mb-4">${message}</p>
+        <p class="text-xs opacity-65 mb-4">Unlocks custom themes, advanced analytics graphs, background self-care routines reminders, and removes all banner ads.</p>
+        
+        <div class="space-y-2" style="margin-top: 1rem;">
+          <button id="upgrade-btn-modal" class="btn btn-block font-outfit" style="background: var(--grad-premium); color: #12101a; box-shadow: 0 0 15px rgba(212, 175, 55, 0.35); font-size: 0.85rem; padding: 0.6rem;">
+            Upgrade Now - $1.99 / Year
+          </button>
+          <button class="btn btn-secondary btn-block btn-sm close-premium-modal">
+            Continue with Free Version
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Close handlers
+  modal.querySelectorAll('.close-premium-modal').forEach(btn => {
+    btn.addEventListener('click', () => modal.remove());
+  });
+
+  // Upgrade handler
+  const upgradeBtn = modal.querySelector('#upgrade-btn-modal');
+  if (upgradeBtn) {
+    upgradeBtn.addEventListener('click', () => {
+      BloomState.premium = true;
+      BloomState.save();
+      
+      const premiumBtn = document.getElementById('premium-toggle');
+      if (premiumBtn) {
+        premiumBtn.classList.add('premium-active');
+        premiumBtn.querySelector('span').innerText = 'Premium Mode';
+      }
+
+      // Hide ads banner
+      const adBanner = document.querySelector('.admob-sim-banner');
+      if (adBanner) adBanner.style.display = 'none';
+
+      // Re-render Analytics
+      if (document.getElementById('view-analytics').classList.contains('active')) {
+        AnalyticsModule.render();
+      }
+
+      modal.remove();
+      StoreModule.playPurchaseChime();
+      showNotification("🎉 Congratulations! Bloom Premium features are unlocked.");
     });
   }
 }
@@ -1792,8 +1917,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // Trigger impression for opening the app!
   MonetizationSimulator.trackImpression();
 
-  // Register PWA Service Worker
-  if ('serviceWorker' in navigator) {
+  // Register PWA Service Worker (only on HTTP/HTTPS to avoid local file:// origin console errors)
+  if ('serviceWorker' in navigator && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
         .then(reg => console.log('[Service Worker] Registered with scope:', reg.scope))

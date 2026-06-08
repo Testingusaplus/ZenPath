@@ -29,6 +29,7 @@ const ProfileModal: React.FC<Props> = ({ user, onClose, onSave, initialEditMode 
   const [country, setCountry] = useState(user.country || 'USA');
   const [state, setState] = useState(user.state || 'California');
   const [zipCode, setZipCode] = useState(user.zipCode || '');
+  const [gender, setGender] = useState(user.gender || 'Prefer not to say');
   
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -102,7 +103,8 @@ const ProfileModal: React.FC<Props> = ({ user, onClose, onSave, initialEditMode 
         avatar,
         country,
         state,
-        zipCode
+        zipCode,
+        gender
       });
       onSave(updatedUser);
       setSuccess("Profile successfully updated!");
@@ -194,9 +196,13 @@ const ProfileModal: React.FC<Props> = ({ user, onClose, onSave, initialEditMode 
                     <span className="text-[10px] text-gray-400 block mb-0.5">State/Province</span>
                     <span className="font-bold text-gray-855 dark:text-white">{user.state || 'California'}</span>
                   </div>
-                  <div className="col-span-2 bg-gray-50 dark:bg-gray-950 p-3 rounded-2xl border border-transparent">
+                  <div className="bg-gray-50 dark:bg-gray-950 p-3 rounded-2xl border border-transparent">
                     <span className="text-[10px] text-gray-400 block mb-0.5">{getZipLabel()}</span>
                     <span className="font-bold text-gray-855 dark:text-white">{user.zipCode || 'N/A'}</span>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-950 p-3 rounded-2xl border border-transparent">
+                    <span className="text-[10px] text-gray-400 block mb-0.5">Gender</span>
+                    <span className="font-bold text-gray-855 dark:text-white">{user.gender || 'Prefer not to say'}</span>
                   </div>
                 </div>
                 
@@ -232,6 +238,21 @@ const ProfileModal: React.FC<Props> = ({ user, onClose, onSave, initialEditMode 
                     className="w-full bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 focus:border-teal-500 rounded-2xl px-4 py-3 outline-none text-xs text-gray-800 dark:text-white"
                     placeholder="+1 (555) 012-3456"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Gender</label>
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 focus:border-teal-500 rounded-2xl px-4 py-3 outline-none text-xs text-gray-800 dark:text-white cursor-pointer"
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Non-binary">Non-binary</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
                 </div>
 
                 {/* Smart Address Section */}

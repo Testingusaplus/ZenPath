@@ -1,5 +1,6 @@
 const CACHE_NAME = 'bloom-wellness-v1';
 const ASSETS = [
+  './',
   './index.html',
   './styles.css',
   './app.js',

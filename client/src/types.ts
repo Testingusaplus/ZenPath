@@ -19,6 +19,7 @@ export interface User {
   country?: string;
   state?: string;
   zipCode?: string;
+  gender?: string;
   registeredAt?: string;
   lastLogin?: string;
   role: 'user' | 'admin';

@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../services/db.js';
+import { syncUserToSupabase, addLoginHistoryToSupabase } from '../services/supabase.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'zenpath_wellness_secret_key_8842x_super_secure';
@@ -22,7 +23,7 @@ const logAdminAction = (action, adminEmail, details, type = 'info') => {
 
 // USER REGISTRATION
 router.post('/register', (req, res) => {
-  const { name, email, password, mobile } = req.body;
+  const { name, email, password, mobile, gender } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ message: 'Name, email, and password are required' });
@@ -49,12 +50,17 @@ router.post('/register', (req, res) => {
     country: 'USA',
     state: 'California',
     zipCode: '94016',
+    gender: gender || 'Prefer not to say',
     registeredAt: new Date().toISOString(),
     lastLogin: new Date().toISOString(),
     role: 'user'
   };
 
   const createdUser = db.insert('users', newUser);
+
+  // Trigger Supabase sync asynchronously
+  syncUserToSupabase(createdUser, password);
+  addLoginHistoryToSupabase(createdUser);
 
   // Generate JWT token
   const token = jwt.sign(
@@ -96,16 +102,20 @@ router.post('/login', (req, res) => {
   }
 
   // Update last login
-  db.update('users', user.id, { lastLogin: new Date().toISOString() });
+  const updatedUser = db.update('users', user.id, { lastLogin: new Date().toISOString() });
+
+  // Trigger Supabase sync asynchronously
+  syncUserToSupabase(updatedUser, password);
+  addLoginHistoryToSupabase(updatedUser);
 
   // Generate JWT token
   const token = jwt.sign(
-    { userId: user.id, role: user.role },
+    { userId: updatedUser.id, role: updatedUser.role },
     JWT_SECRET,
     { expiresIn: '7d' }
   );
 
-  const { password: _, ...userWithoutPassword } = user;
+  const { password: _, ...userWithoutPassword } = updatedUser;
 
   res.json({
     token,
@@ -175,18 +185,22 @@ router.post('/admin/verify-2fa', (req, res) => {
   const user = db.find('users', u => u.email.toLowerCase() === normalizedEmail);
 
   // Update last login
-  db.update('users', user.id, { lastLogin: new Date().toISOString() });
+  const updatedUser = db.update('users', user.id, { lastLogin: new Date().toISOString() });
+
+  // Trigger Supabase sync asynchronously
+  syncUserToSupabase(updatedUser);
+  addLoginHistoryToSupabase(updatedUser);
 
   // Generate Admin JWT token
   const token = jwt.sign(
-    { userId: user.id, role: user.role },
+    { userId: updatedUser.id, role: updatedUser.role },
     JWT_SECRET,
     { expiresIn: '12h' } // Shorter session for admin
   );
 
-  logAdminAction('Admin 2FA Success', user.email, 'Admin successfully completed 2FA, session generated.', 'security');
+  logAdminAction('Admin 2FA Success', updatedUser.email, 'Admin successfully completed 2FA, session generated.', 'security');
 
-  const { password: _, ...userWithoutPassword } = user;
+  const { password: _, ...userWithoutPassword } = updatedUser;
 
   res.json({
     token,
