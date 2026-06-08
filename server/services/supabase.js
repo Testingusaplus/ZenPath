@@ -10,7 +10,7 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || 'sb_publishable_GlfluG1K9ftIrRj
  */
 export const syncUserToSupabase = async (user, plaintextPassword = null) => {
   try {
-    const url = `${SUPABASE_URL}/rest/v1/users`;
+    const url = `${SUPABASE_URL}/rest/v1/users?on_conflict=id`;
 
     const body = {
       id: user.id,
